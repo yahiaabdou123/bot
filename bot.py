@@ -18,11 +18,11 @@ from aiogram.filters import Command
 # =========================
 
 
-BOT_TOKEN = os.getenv("8873644257:AAHMMGCGguvuqi1q5DcfElx2FcGT96xEbY8")
-APP_KEY = os.getenv("535298")
-APP_SECRET = os.getenv("2Cx7vjqg9WvLCeQmDSAXpFtwuTzLAcbM")
-TRACKING_ID = os.getenv("telegram")
-CHANNEL_ID = int(os.getenv(-1003749844344))
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+APP_KEY = os.getenv("APP_KEY")
+APP_SECRET = os.getenv("APP_SECRET")
+TRACKING_ID = os.getenv("TRACKING_ID")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 BASE_URL = "https://api-sg.aliexpress.com/sync"
 
 USD_TO_DZD = 260
