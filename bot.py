@@ -44,7 +44,7 @@ PRODUCT_QUEUE = []
 POSTED_FILE = "posted.json"
 POSTED_IDS = set()
 SEARCH_KEYWORDS = [ 
-    "anime",
+    "home",
 ]
 
 # =========================
