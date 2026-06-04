@@ -43,11 +43,8 @@ dp = Dispatcher()
 PRODUCT_QUEUE = []
 POSTED_FILE = "posted.json"
 POSTED_IDS = set()
-SEARCH_KEYWORDS = [
-    "electronics",
-    "phone",  
-    "xiaomi store",  
-    "RX",  
+SEARCH_KEYWORDS = [ 
+    "anime",
 ]
 
 # =========================
