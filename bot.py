@@ -274,9 +274,9 @@ def build_caption(p):
 
 💵 السعر : {usd}$ | {dzd:,} دج
 🔖 الخصم : {p.get('discount','N/A')}
-📊 عدد المبيعات : {p.get('lastest_volume','0')}
+🚀 عدد المبيعات : {p.get('lastest_volume','0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-                🚀 اضغط على زر الشراء أسفل ⏬
+              ⏬ اضغط على زر الشراء أسفل ⏬
 """
 
 def build_button(link):
