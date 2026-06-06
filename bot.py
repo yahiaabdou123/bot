@@ -108,9 +108,9 @@ async def fill_queue():
         {
             "keywords": keyword,
             "page_no": page,
-            "page_size": 50,
+            "page_size": 10,
             "target_currency": "USD",
-            "target_language": "EN",
+            "target_language": "AR",
             "tracking_id": TRACKING_ID,
             "sort": "LAST_VOLUME_DESC"
         }
