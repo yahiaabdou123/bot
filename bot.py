@@ -127,7 +127,6 @@ SEARCH_KEYWORDS = [
     "Travel Gadgets",
     "Innovative Gadgets",
     "Wireless Devices",
-    "Mini Gadgets",
     "Best Selling Electronics",
     "New Tech 2026",
     "Viral Products",
@@ -147,8 +146,7 @@ SEARCH_KEYWORDS = [
     "Portable Tech Devices",
     "Wireless Technology",
     "Mini Electronic Devices",
-    "Cool Electronics",
-    "Modern Gadgets",
+    "Smartphone",
     "Future Tech Gadgets",
 ]
 
