@@ -272,9 +272,9 @@ def build_caption(p):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━ 
 🔥 <b>{title}</b>
 
-💰 السعر: {usd}$ | {dzd:,} دج
-📉 خصم: {p.get('discount','N/A')}
-📊 مبيعات: {p.get('lastest_volume','0')}
+💵 السعر : {usd}$ | {dzd:,} دج
+🔖 الخصم : {p.get('discount','N/A')}
+📊 عدد المبيعات : {p.get('lastest_volume','0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
     🚀 اضغط على زر الشراء أسفل 👇
 """
