@@ -268,7 +268,7 @@ def build_caption(p):
     dzd = int(usd * USD_TO_DZD)
 
     return f"""    
-🇩🇿 أفضل عروض💥Aliexpress💥الأكثر مبيعا و تقييما
+أفضل عروض💥Aliexpress🇩🇿الأكثر مبيعا و تقييما
 ━━━━━━━━━━━━━━━━━━━━━━━━━━ 
 🔥 <b>{title}</b>
 
