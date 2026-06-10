@@ -6,7 +6,6 @@ import aiohttp
 import random
 import json
 import os
-
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.enums import ParseMode
@@ -16,7 +15,6 @@ from aiogram.filters import Command
 # =========================
 # CONFIG
 # =========================
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = os.getenv("APP_SECRET")
@@ -32,127 +30,49 @@ bot = Bot(
     token=BOT_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
-
 dp = Dispatcher()
 
 # =========================
 # STORAGE
 # =========================
-
 PRODUCT_QUEUE = []
 POSTED_FILE = "posted.json"
 POSTED_IDS = set()
 SEARCH_KEYWORDS = [
-    "Smart Watch",
-    "Wireless Earbuds",
-    "Bluetooth Earbuds",
-    "TWS Earbuds",
-    "Gaming Headset",
-    "Gaming Mouse",
-    "Mechanical Keyboard",
-    "RGB Keyboard",
-    "Gaming Controller",
-    "Phone Cooler",
-    "Power Bank",
-    "Fast Charger 65W",
-    "USB C Cable",
-    "Wireless Charger",
-    "MagSafe Charger",
-    "Phone Holder",
-    "Magnetic Phone Holder",
-    "Mini Projector",
-    "Portable Projector",
-    "Bluetooth Speaker",
-    "Smart Ring",
-    "Fitness Tracker",
-    "Smart Home Device",
-    "WiFi Camera",
-    "Security Camera",
-    "Dash Cam",
-    "Car Phone Holder",
-    "Car Charger",
-    "CarPlay Adapter",
-    "LED Strip Lights",
-    "RGB Lights",
-    "LED Matrix Display",
-    "USB Hub",
-    "USB C Hub",
-    "Laptop Stand",
-    "Bluetooth Mouse",
-    "Portable SSD",
-    "External Hard Drive",
-    "Thermal Printer",
-    "Mini Printer",
-    "Air Duster",
-    "Mini Vacuum Cleaner",
-    "Portable Fan",
-    "Rechargeable Flashlight",
-    "Digital Alarm Clock",
-    "Webcam HD",
-    "Action Camera",
-    "Drone Camera",
-    "VR Headset",
-    "Gamepad Mobile",
-    "Streaming Microphone",
-    "USB Microphone",
-    "Tripod Phone",
-    "Selfie Stick",
-    "Ring Light",
-    "Portable Monitor",
-    "Mini PC",
-    "Android TV Box",
-    "Smart TV Stick",
-    "Wireless Keyboard",
-    "Wireless Mouse",
-    "Solar Power Bank",
-    "Wireless Security Camera",
-    "Mini Bluetooth Speaker",
-    "Noise Cancelling Earbuds",
-    "Gaming Desk Accessories",
-    "Tech Gadgets",
-    "Cool Gadgets",
-    "Trending Gadgets",
-    "TikTok Gadgets",
-    "Budget Tech",
-    "Portable Electronics",
-    "Gamer Accessories",
-    "Mobile Accessories",
-    "Smartphone Accessories",
-    "RGB Gaming Setup",
-    "USB Gadgets",
-    "Electronic Gadgets",
-    "Home Tech",
-    "Car Tech Accessories",
-    "Travel Gadgets",
-    "Innovative Gadgets",
-    "Wireless Devices",
-    "Best Selling Electronics",
-    "New Tech 2026",
-    "Viral Products",
-    "Hot Sale Electronics",
-    "AliExpress Finds",
-    "Must Have Gadgets",
-    "Tech Gifts",
-    "Student Gadgets",
-    "Office Gadgets",
-    "Desk Setup Accessories",
-    "Gaming Setup Accessories",
-    "Phone Accessories",
-    "Laptop Accessories",
-    "Computer Accessories",
-    "Electronic Accessories",
-    "Smart Devices",
-    "Portable Tech Devices",
-    "Wireless Technology",
-    "Mini Electronic Devices",
-    "Smartphone",
-    "Future Tech Gadgets",
+    "Smart Watch", "Wireless Earbuds", "Bluetooth Earbuds", "TWS Earbuds",
+    "Gaming Headset", "Gaming Mouse", "Mechanical Keyboard", "RGB Keyboard",
+    "Gaming Controller", "Phone Cooler", "Power Bank", "Fast Charger 65W",
+    "USB C Cable", "Wireless Charger", "MagSafe Charger", "Phone Holder",
+    "Magnetic Phone Holder", "Mini Projector", "Portable Projector",
+    "Bluetooth Speaker", "Smart Ring", "Fitness Tracker", "Smart Home Device",
+    "WiFi Camera", "Security Camera", "Dash Cam", "Car Phone Holder",
+    "Car Charger", "CarPlay Adapter", "LED Strip Lights", "RGB Lights",
+    "LED Matrix Display", "USB Hub", "USB C Hub", "Laptop Stand",
+    "Bluetooth Mouse", "Portable SSD", "External Hard Drive", "Thermal Printer",
+    "Mini Printer", "Air Duster", "Mini Vacuum Cleaner", "Portable Fan",
+    "Rechargeable Flashlight", "Digital Alarm Clock", "Webcam HD",
+    "Action Camera", "Drone Camera", "VR Headset", "Gamepad Mobile",
+    "Streaming Microphone", "USB Microphone", "Tripod Phone", "Selfie Stick",
+    "Ring Light", "Portable Monitor", "Mini PC", "Android TV Box",
+    "Smart TV Stick", "Wireless Keyboard", "Wireless Mouse", "Solar Power Bank",
+    "Wireless Security Camera", "Mini Bluetooth Speaker", "Noise Cancelling Earbuds",
+    "Gaming Desk Accessories", "Tech Gadgets", "Cool Gadgets", "Trending Gadgets",
+    "TikTok Gadgets", "Budget Tech", "Portable Electronics", "Gamer Accessories",
+    "Mobile Accessories", "Smartphone Accessories", "RGB Gaming Setup",
+    "USB Gadgets", "Electronic Gadgets", "Home Tech", "Car Tech Accessories",
+    "Travel Gadgets", "Innovative Gadgets", "Wireless Devices",
+    "Best Selling Electronics", "New Tech 2026", "Viral Products",
+    "Hot Sale Electronics", "AliExpress Finds", "Must Have Gadgets",
+    "Tech Gifts", "Student Gadgets", "Office Gadgets", "Desk Setup Accessories",
+    "Gaming Setup Accessories", "Phone Accessories", "Laptop Accessories",
+    "Computer Accessories", "Electronic Accessories", "Smart Devices",
+    "Portable Tech Devices", "Wireless Technology", "Mini Electronic Devices",
+    "Smartphone", "Future Tech Gadgets",
 ]
 
 # =========================
 # LOAD SAVED POSTS
 # =========================
-
 def load_posted():
     global POSTED_IDS
     if os.path.exists(POSTED_FILE):
@@ -166,7 +86,6 @@ def save_posted():
 # =========================
 # SIGNATURE
 # =========================
-
 def generate_sign(params):
     s = APP_SECRET
     for k, v in sorted(params.items()):
@@ -177,7 +96,6 @@ def generate_sign(params):
 # =========================
 # API REQUEST
 # =========================
-
 async def api_request(method, extra):
     params = {
         "app_key": APP_KEY,
@@ -187,7 +105,6 @@ async def api_request(method, extra):
         "v": "2.0",
         "sign_method": "md5",
     }
-
     params.update(extra)
     params["sign"] = generate_sign(params)
 
@@ -198,7 +115,6 @@ async def api_request(method, extra):
 # =========================
 # SHORT LINK
 # =========================
-
 async def get_short_link(original_url: str) -> str:
     try:
         resp = await api_request(
@@ -223,9 +139,8 @@ async def get_short_link(original_url: str) -> str:
         return original_url
 
 # =========================
-# PRODUCT DETAIL
+# SHIPPING INFO
 # =========================
-
 async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: str) -> dict:
     try:
         resp = await api_request(
@@ -241,28 +156,21 @@ async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: 
                 "target_language": "FR"
             }
         )
-
         result = (
             resp.get("aliexpress_affiliate_product_shipping_get_response", {})
             .get("resp_result", {})
             .get("result", {})
         )
-
-        if not result:
-            return {}
-
-        return result
-
+        return result if result else {}
     except:
         return {}
+
 # =========================
 # FETCH PRODUCTS
 # =========================
-
 async def fill_queue():
     global PRODUCT_QUEUE
 
-    # تجربة كلمات مختلفة حتى يجد منتجات
     keywords_to_try = random.sample(SEARCH_KEYWORDS, min(10, len(SEARCH_KEYWORDS)))
 
     for keyword in keywords_to_try:
@@ -312,16 +220,14 @@ async def fill_queue():
             PRODUCT_QUEUE.append(p)
 
         PRODUCT_QUEUE.sort(key=lambda x: int(x.get("lastest_volume", 0)), reverse=True)
-
         print(f"Loaded {len(PRODUCT_QUEUE)} products for keyword: {keyword}")
 
         if PRODUCT_QUEUE:
-            break  # وجد منتجات، توقف عن المحاولة
+            break
 
 # =========================
 # FORMAT MESSAGE
 # =========================
-
 def build_caption(p):
     title = p.get("product_title", "No Title")[:120]
 
@@ -333,7 +239,6 @@ def build_caption(p):
     dzd = int(usd * USD_TO_DZD)
 
     shipping = p.get("shipping_info", {})
-
     fee = shipping.get("shipping_fee", "0")
     min_days = shipping.get("min_delivery_days", "?")
     max_days = shipping.get("max_delivery_days", "?")
@@ -356,7 +261,9 @@ def build_caption(p):
 💵 السعر : {usd}$ | {dzd:,} دج
 🚚 الشحن : {shipping_line}
 📦 مدة التوصيل : {min_days} - {max_days} يوم
-🚀 عدد المبيعات : {p.get('lastest_volume','0')}
+🌍 يُشحن من : {from_country}
+🔖 الخصم : {p.get('discount', 'N/A')}
+🚀 عدد المبيعات : {p.get('lastest_volume', '0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
               ⏬ اضغط على زر الشراء أسفل ⏬
 """
@@ -367,13 +274,12 @@ def build_button(link):
             [InlineKeyboardButton(text="🛒 شراء الآن", url=link)]
         ]
     )
+
 # =========================
 # POST LOOP
 # =========================
-
 async def post_loop():
     while True:
-
         if not PRODUCT_QUEUE:
             await fill_queue()
 
@@ -383,7 +289,6 @@ async def post_loop():
             continue
 
         product = PRODUCT_QUEUE.pop(0)
-
         pid = str(product.get("product_id"))
         POSTED_IDS.add(pid)
         save_posted()
@@ -392,17 +297,18 @@ async def post_loop():
         sku_id = str(product.get("sku_id", ""))
         tax_rate = str(product.get("tax_rate", "0.00"))
         shipping = await get_shipping_info(pid, price, sku_id, tax_rate)
-        product["shipping_info"] = shipping      
-              
-        fee = shipping.get("shipping_fee", "0")
-                try:
-                    if float(fee) >= 5:
-                        print(f"Skipping product {pid} - shipping fee {fee}$")
-                        continue
-                except:
-                    pass
 
-                product["shipping_info"] = shipping
+        # فلترة الشحن أكثر من 5$
+        fee = shipping.get("shipping_fee", "0")
+        try:
+            if float(fee) >= 5:
+                print(f"Skipping product {pid} - shipping fee {fee}$")
+                continue
+        except:
+            pass
+
+        product["shipping_info"] = shipping
+
         link = await get_short_link(product.get("promotion_link"))
 
         try:
@@ -420,10 +326,10 @@ async def post_loop():
 # =========================
 # COMMANDS
 # =========================
-
 @dp.message(Command("start"))
 async def start(m: Message):
     await m.answer("✅ البوت يعمل الآن ويقوم بالنشر التلقائي.")
+
 @dp.message(Command("test"))
 async def test(m: Message):
     resp = await api_request(
@@ -441,19 +347,18 @@ async def test(m: Message):
     )
     print(json.dumps(resp, indent=2, ensure_ascii=False))
     await m.answer("تم إرسال نتيجة الشحن إلى الكونسول.")
+
 # =========================
 # MAIN
 # =========================
-
 async def main():
     print("BOT STARTED")
-
     load_posted()
-
     asyncio.create_task(post_loop())
-
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
+    asyncio.run(main())
+
     asyncio.run(main())
