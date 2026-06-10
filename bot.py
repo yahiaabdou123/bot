@@ -53,7 +53,7 @@ SEARCH_KEYWORDS = [
     "RGB Keyboard",
     "Gaming Controller",
     "Phone Cooler",
-    "Power Ban",
+    "Power Bank",
     "Fast Charger 65W",
     "USB C Cable",
     "Wireless Charger",
@@ -223,62 +223,100 @@ async def get_short_link(original_url: str) -> str:
         return original_url
 
 # =========================
+# PRODUCT DETAIL
+# =========================
+
+async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: str) -> dict:
+    try:
+        resp = await api_request(
+            "aliexpress.affiliate.product.shipping.get",
+            {
+                "product_id": product_id,
+                "sku_id": sku_id,
+                "tax_rate": tax_rate,
+                "tracking_id": TRACKING_ID,
+                "ship_to_country": "DZ",
+                "target_currency": "USD",
+                "target_sale_price": price,
+                "target_language": "FR"
+            }
+        )
+
+        result = (
+            resp.get("aliexpress_affiliate_product_shipping_get_response", {})
+            .get("resp_result", {})
+            .get("result", {})
+        )
+
+        if not result:
+            return {}
+
+        return result
+
+    except:
+        return {}
+# =========================
 # FETCH PRODUCTS
 # =========================
 
 async def fill_queue():
     global PRODUCT_QUEUE
 
-    keyword = random.choice(SEARCH_KEYWORDS)
-    page = random.randint(1, 30)
+    # تجربة كلمات مختلفة حتى يجد منتجات
+    keywords_to_try = random.sample(SEARCH_KEYWORDS, min(10, len(SEARCH_KEYWORDS)))
 
-    resp = await api_request(
-        "aliexpress.affiliate.product.query",
-        {
-            "keywords": keyword,
-            "page_no": page,
-            "page_size": 1,
-            "target_currency": "USD",
-            "target_language": "FR",
-            "tracking_id": TRACKING_ID,
-            "sort": "LAST_VOLUME_DESC",
-            "ship_to_country": "DZ",
-            "country": "DZ"
-        }
-    )
+    for keyword in keywords_to_try:
+        resp = await api_request(
+            "aliexpress.affiliate.hotproduct.query",
+            {
+                "keywords": keyword,
+                "page_no": 1,
+                "page_size": 20,
+                "target_currency": "USD",
+                "target_language": "FR",
+                "tracking_id": TRACKING_ID,
+                "sort": "LAST_VOLUME_DESC",
+                "ship_to_country": "DZ"
+            }
+        )
 
-    products = (
-        resp.get("aliexpress_affiliate_product_query_response", {})
-        .get("resp_result", {})
-        .get("result", {})
-        .get("products", {})
-        .get("product", [])
-    )
+        products = (
+            resp.get("aliexpress_affiliate_hotproduct_query_response", {})
+            .get("resp_result", {})
+            .get("result", {})
+            .get("products", {})
+            .get("product", [])
+        )
 
-    PRODUCT_QUEUE = []
+        PRODUCT_QUEUE = []
 
-    for p in products:
-        pid = str(p.get("product_id"))
+        for p in products:
+            pid = str(p.get("product_id"))
 
-        if pid in POSTED_IDS:
-            continue
+            if pid in POSTED_IDS:
+                continue
 
-        try:
-            price = float(p.get("target_sale_price", 0))
-        except:
-            continue
+            try:
+                price = float(p.get("target_sale_price", 0))
+            except:
+                continue
 
-        volume = int(p.get("lastest_volume", 0))
+            volume = int(p.get("lastest_volume", 0))
 
-        if price < 2:
-            continue
+            if price < 2:
+                continue
 
-        if volume < 10:
-            continue
+            if volume < 100:
+                continue
 
-        PRODUCT_QUEUE.append(p)
+            PRODUCT_QUEUE.append(p)
 
-    print(f"Loaded {len(PRODUCT_QUEUE)} products for keyword: {keyword}")
+        PRODUCT_QUEUE.sort(key=lambda x: int(x.get("lastest_volume", 0)), reverse=True)
+
+        print(f"Loaded {len(PRODUCT_QUEUE)} products for keyword: {keyword}")
+
+        if PRODUCT_QUEUE:
+            break  # وجد منتجات، توقف عن المحاولة
 
 # =========================
 # FORMAT MESSAGE
@@ -294,12 +332,31 @@ def build_caption(p):
 
     dzd = int(usd * USD_TO_DZD)
 
-    return f"""    
+    shipping = p.get("shipping_info", {})
+
+    fee = shipping.get("shipping_fee", "0")
+    min_days = shipping.get("min_delivery_days", "?")
+    max_days = shipping.get("max_delivery_days", "?")
+    from_country = shipping.get("ship_from_country", "?")
+
+    if fee == "0" or fee == "0.0":
+        shipping_line = "مجاني ✅"
+    else:
+        try:
+            fee_dzd = int(float(fee) * USD_TO_DZD)
+            shipping_line = f"{fee}$ | {fee_dzd:,} دج"
+        except:
+            shipping_line = "راجع صفحة المنتج"
+
+    return f"""
 أفضل عروض💥Aliexpress🇩🇿الأكثر مبيعا و تقييما
-━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔥 <b>{title}</b>
 
 💵 السعر : {usd}$ | {dzd:,} دج
+🚚 الشحن : {shipping_line}
+📦 مدة التوصيل : {min_days} - {max_days} يوم
+🌍 يُشحن من : {from_country}
 🔖 الخصم : {p.get('discount','N/A')}
 🚀 عدد المبيعات : {p.get('lastest_volume','0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -312,7 +369,6 @@ def build_button(link):
             [InlineKeyboardButton(text="🛒 شراء الآن", url=link)]
         ]
     )
-
 # =========================
 # POST LOOP
 # =========================
@@ -324,7 +380,8 @@ async def post_loop():
             await fill_queue()
 
         if not PRODUCT_QUEUE:
-            await asyncio.sleep(30)
+            print("No products found, retrying in 60 seconds...")
+            await asyncio.sleep(60)
             continue
 
         product = PRODUCT_QUEUE.pop(0)
@@ -332,6 +389,12 @@ async def post_loop():
         pid = str(product.get("product_id"))
         POSTED_IDS.add(pid)
         save_posted()
+
+        price = product.get("target_sale_price", "0")
+        sku_id = str(product.get("sku_id", ""))
+        tax_rate = str(product.get("tax_rate", "0.00"))
+        shipping = await get_shipping_info(pid, price, sku_id, tax_rate)
+        product["shipping_info"] = shipping
 
         link = await get_short_link(product.get("promotion_link"))
 
@@ -354,21 +417,23 @@ async def post_loop():
 @dp.message(Command("start"))
 async def start(m: Message):
     await m.answer("✅ البوت يعمل الآن ويقوم بالنشر التلقائي.")
-
 @dp.message(Command("test"))
 async def test(m: Message):
     resp = await api_request(
-        "aliexpress.affiliate.product.query",
+        "aliexpress.affiliate.product.shipping.get",
         {
-            "keywords": "headphones",
-            "page_no": 1,
-            "page_size": 5,
-            "tracking_id": TRACKING_ID
+            "product_id": "1005012397551535",
+            "sku_id": "12000058297248839",
+            "tax_rate": "0.00",
+            "tracking_id": TRACKING_ID,
+            "ship_to_country": "DZ",
+            "target_currency": "USD",
+            "target_sale_price": "12.08",
+            "target_language": "FR"
         }
     )
-    print(resp)
-    await m.answer("تم إرسال النتيجة إلى الكونسول.")
-
+    print(json.dumps(resp, indent=2, ensure_ascii=False))
+    await m.answer("تم إرسال نتيجة الشحن إلى الكونسول.")
 # =========================
 # MAIN
 # =========================
