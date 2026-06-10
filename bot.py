@@ -356,8 +356,6 @@ def build_caption(p):
 💵 السعر : {usd}$ | {dzd:,} دج
 🚚 الشحن : {shipping_line}
 📦 مدة التوصيل : {min_days} - {max_days} يوم
-🌍 يُشحن من : {from_country}
-🔖 الخصم : {p.get('discount','N/A')}
 🚀 عدد المبيعات : {p.get('lastest_volume','0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
               ⏬ اضغط على زر الشراء أسفل ⏬
