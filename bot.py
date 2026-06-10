@@ -392,8 +392,17 @@ async def post_loop():
         sku_id = str(product.get("sku_id", ""))
         tax_rate = str(product.get("tax_rate", "0.00"))
         shipping = await get_shipping_info(pid, price, sku_id, tax_rate)
-        product["shipping_info"] = shipping
+        product["shipping_info"] = shipping      
+              
+        fee = shipping.get("shipping_fee", "0")
+                try:
+                    if float(fee) >= 5:
+                        print(f"Skipping product {pid} - shipping fee {fee}$")
+                        continue
+                except:
+                    pass
 
+                product["shipping_info"] = shipping
         link = await get_short_link(product.get("promotion_link"))
 
         try:
