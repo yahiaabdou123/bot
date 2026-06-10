@@ -17,7 +17,6 @@ from aiogram.filters import Command
 # CONFIG
 # =========================
 
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = os.getenv("APP_SECRET")
@@ -43,7 +42,7 @@ dp = Dispatcher()
 PRODUCT_QUEUE = []
 POSTED_FILE = "posted.json"
 POSTED_IDS = set()
-SEARCH_KEYWORDS = [ 
+SEARCH_KEYWORDS = [
     "Smart Watch",
     "Wireless Earbuds",
     "Bluetooth Earbuds",
@@ -197,6 +196,33 @@ async def api_request(method, extra):
             return await r.json()
 
 # =========================
+# SHORT LINK
+# =========================
+
+async def get_short_link(original_url: str) -> str:
+    try:
+        resp = await api_request(
+            "aliexpress.affiliate.link.generate",
+            {
+                "promotion_link_type": "0",
+                "source_values": original_url,
+                "tracking_id": TRACKING_ID
+            }
+        )
+        links = (
+            resp.get("aliexpress_affiliate_link_generate_response", {})
+            .get("resp_result", {})
+            .get("result", {})
+            .get("promotion_links", {})
+            .get("promotion_link", [])
+        )
+        if links:
+            return links[0].get("promotion_link", original_url)
+        return original_url
+    except:
+        return original_url
+
+# =========================
 # FETCH PRODUCTS
 # =========================
 
@@ -237,7 +263,6 @@ async def fill_queue():
         if pid in POSTED_IDS:
             continue
 
-        # فلترة المنتجات الضعيفة
         try:
             price = float(p.get("target_sale_price", 0))
         except:
@@ -245,7 +270,7 @@ async def fill_queue():
 
         volume = int(p.get("lastest_volume", 0))
 
-        if price < 2:   # تجاهل المنتجات الرخيصة جداً
+        if price < 2:
             continue
 
         if volume < 10:
@@ -308,17 +333,19 @@ async def post_loop():
         POSTED_IDS.add(pid)
         save_posted()
 
+        link = await get_short_link(product.get("promotion_link"))
+
         try:
             await bot.send_photo(
                 chat_id=CHANNEL_ID,
                 photo=product.get("product_main_image_url"),
                 caption=build_caption(product),
-                reply_markup=build_button(product.get("promotion_link"))
+                reply_markup=build_button(link)
             )
         except Exception as e:
             print("ERROR SENDING:", e)
 
-        await asyncio.sleep(900)  # 15 دقيقة
+        await asyncio.sleep(900)
 
 # =========================
 # COMMANDS
