@@ -179,7 +179,7 @@ async def fill_queue():
             {
                 "keywords": keyword,
                 "page_no": 1,
-                "page_size": 20,
+                "page_size": 1,
                 "target_currency": "USD",
                 "target_language": "FR",
                 "tracking_id": TRACKING_ID,
@@ -214,7 +214,7 @@ async def fill_queue():
             if price < 2:
                 continue
 
-            if volume < 100:
+            if volume < 1000:
                 continue
 
             PRODUCT_QUEUE.append(p)
@@ -261,8 +261,6 @@ def build_caption(p):
 💵 السعر : {usd}$ | {dzd:,} دج
 🚚 الشحن : {shipping_line}
 📦 مدة التوصيل : {min_days} - {max_days} يوم
-🌍 يُشحن من : {from_country}
-🔖 الخصم : {p.get('discount', 'N/A')}
 🚀 عدد المبيعات : {p.get('lastest_volume', '0')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
               ⏬ اضغط على زر الشراء أسفل ⏬
