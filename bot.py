@@ -215,7 +215,9 @@ async def fill_queue():
             "target_currency": "USD",
             "target_language": "FR",
             "tracking_id": TRACKING_ID,
-            "sort": "LAST_VOLUME_DESC"
+            "sort": "LAST_VOLUME_DESC",
+            "ship_to_country": "DZ",
+            "country": "DZ"
         }
     )
 
