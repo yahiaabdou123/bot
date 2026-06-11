@@ -53,10 +53,13 @@ DATA_DIR = "/app/data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 PRODUCT_QUEUE = []
+POSTED_IDS = set()        # ← أضف هذا
+KEYWORD_INDEX = 0         # ← أضف هذا
 DATA_DIR = "/app/data"
 os.makedirs(DATA_DIR, exist_ok=True)
 POSTED_FILE = os.path.join(DATA_DIR, "posted.json")
 KEYWORD_INDEX_FILE = os.path.join(DATA_DIR, "keyword_index.json")
+
 
 SEARCH_KEYWORDS = [
     "Smart Watch", "Wireless Earbuds", "Bluetooth Earbuds", "TWS Earbuds",
