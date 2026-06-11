@@ -179,7 +179,7 @@ async def fill_queue():
             {
                 "keywords": keyword,
                 "page_no": 1,
-                "page_size": 1,
+                "page_size": 20,
                 "target_currency": "USD",
                 "target_language": "FR",
                 "tracking_id": TRACKING_ID,
