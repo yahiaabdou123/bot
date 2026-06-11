@@ -25,6 +25,8 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 BASE_URL = "https://api-sg.aliexpress.com/sync"
 
+
+
 USD_TO_DZD = 260
 MAX_SHIP_FEE = 7
 MIN_VOLUME = 1000
@@ -32,8 +34,8 @@ MIN_PRICE = 2
 MIN_DISCOUNT = 10
 POST_INTERVAL = 900       # 15 minutes between posts
 
-WEBSITE_URL = "https"
-SOCIAL_URL = "https://www.instagram.com/affixon_express?igsh=MW5vY2Q5NGJoYXJr"
+WEBSITE_URL = "https://your-site.com"
+SOCIAL_URL = "https://t.me/yourchannel"
 POST_COUNTER = 0
 
 logging.basicConfig(
@@ -645,9 +647,6 @@ async def main():
     asyncio.create_task(post_loop())
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
 
 if __name__ == "__main__":
     asyncio.run(main())
