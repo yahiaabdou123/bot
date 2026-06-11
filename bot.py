@@ -16,7 +16,6 @@ from aiogram.filters import Command
 # CONFIG
 # =========================
 
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = os.getenv("APP_SECRET")
@@ -25,14 +24,12 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 BASE_URL = "https://api-sg.aliexpress.com/sync"
 
-
-
 USD_TO_DZD = 260
 MAX_SHIP_FEE = 7
 MIN_VOLUME = 1000
 MIN_PRICE = 2
 MIN_DISCOUNT = 10
-POST_INTERVAL = 900       # 15 minutes between posts
+POST_INTERVAL = 900       # 15 دقيقة بين كل منشور
 
 WEBSITE_URL = "https://your-site.com"
 SOCIAL_URL = "https://t.me/yourchannel"
@@ -50,14 +47,16 @@ bot = Bot(
 dp = Dispatcher()
 
 # =========================
-# STORAGE
+# STORAGE — مسارات ثابتة على Railway Volume
 # =========================
+DATA_DIR = "/app/data"
+os.makedirs(DATA_DIR, exist_ok=True)
+
 PRODUCT_QUEUE = []
-POSTED_FILE = "posted.json"
+POSTED_FILE = os.path.join(DATA_DIR, "posted.json")
 POSTED_IDS = set()
 
-# Keyword index rotates sequentially so every keyword gets used
-KEYWORD_INDEX_FILE = "keyword_index.json"
+KEYWORD_INDEX_FILE = os.path.join(DATA_DIR, "keyword_index.json")
 KEYWORD_INDEX = 0
 
 SEARCH_KEYWORDS = [
@@ -129,7 +128,7 @@ def save_keyword_index():
         json.dump({"index": KEYWORD_INDEX}, f)
 
 def next_keyword() -> str:
-    """Returns the next keyword in rotation and advances the index."""
+    """يرجع الكلمة التالية في الدورة ويقدّم الفهرس."""
     global KEYWORD_INDEX
     keyword = SEARCH_KEYWORDS[KEYWORD_INDEX]
     KEYWORD_INDEX = (KEYWORD_INDEX + 1) % len(SEARCH_KEYWORDS)
@@ -147,7 +146,7 @@ def generate_sign(params: dict) -> str:
     return hashlib.md5(s.encode()).hexdigest().upper()
 
 # =========================
-# API REQUEST (with retry + exponential backoff)
+# API REQUEST (مع إعادة المحاولة والانتظار التدريجي)
 # =========================
 async def api_request(method: str, extra: dict, retries: int = 3) -> dict:
     params = {
@@ -171,7 +170,7 @@ async def api_request(method: str, extra: dict, retries: int = 3) -> dict:
                 ) as r:
                     return await r.json()
         except Exception as e:
-            wait = 2 ** attempt  # exponential backoff: 1s, 2s, 4s
+            wait = 2 ** attempt
             logging.warning(f"API request failed (attempt {attempt+1}/{retries}): {e}. Retrying in {wait}s…")
             await asyncio.sleep(wait)
     return {}
@@ -206,7 +205,6 @@ async def shorten_title(title: str) -> str:
             ) as r:
                 data = await r.json()
                 short = data["choices"][0]["message"]["content"].strip()
-                # Strip surrounding quotes if present
                 short = short.strip('"\'')
                 return short if short else title[:60]
     except Exception as e:
@@ -270,7 +268,9 @@ async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: 
         logging.warning(f"Shipping info failed: {e}")
         return {}
 
-
+# =========================
+# FETCH PRODUCT — عشوائي (للمنشورات الأولى)
+# =========================
 async def fetch_product_query():
     for _ in range(10):
         keyword = random.choice(SEARCH_KEYWORDS)
@@ -297,29 +297,25 @@ async def fetch_product_query():
             )
 
             filtered = []
-
             for p in products:
                 pid = str(p.get("product_id", ""))
                 if not pid or pid in POSTED_IDS:
                     continue
-
                 try:
                     price = float(p.get("target_sale_price", 0))
                     volume = int(p.get("lastest_volume", 0))
                     discount = int(str(p.get("discount", "0")).replace("%", ""))
-                except:
+                except Exception:
                     continue
-
                 if price < MIN_PRICE or volume < MIN_VOLUME or discount < MIN_DISCOUNT:
                     continue
-
                 if not p.get("product_main_image_url"):
                     continue
-
                 filtered.append(p)
 
             if filtered:
-                return random.choice(filtered)
+                # ✅ إصلاح: اختيار المنتج الأعلى مبيعاً بدل العشوائي
+                return max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
 
         except Exception as e:
             logging.error(e)
@@ -327,14 +323,13 @@ async def fetch_product_query():
     return None
 
 # =========================
-# FETCH ONE PRODUCT — one keyword per post cycle
+# FETCH ONE PRODUCT — كلمة مفتاحية واحدة لكل دورة
 # =========================
 async def fetch_one_product() -> dict | None:
     """
-    Advances to the next keyword, fetches products for it, filters them,
-    and returns the single best one (highest sales volume).
-    Tries up to 10 consecutive keywords if a keyword yields nothing.
-    Returns None if all attempts fail.
+    يستخدم الكلمة التالية في الدورة، يجلب المنتجات، يفلترها،
+    ويرجع المنتج الأعلى مبيعاً.
+    يجرب 10 كلمات متتالية إذا لم يجد نتائج.
     """
     for _ in range(min(10, len(SEARCH_KEYWORDS))):
         keyword = next_keyword()
@@ -393,8 +388,8 @@ async def fetch_one_product() -> dict | None:
                 logging.info(f"Keyword '{keyword}': no valid products, trying next…")
                 continue
 
-            # Pick the best product (highest sales volume)
-            best = random.choice(filtered)
+            # ✅ إصلاح: اختيار المنتج الأعلى مبيعاً بدل العشوائي
+            best = max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
             logging.info(
                 f"Keyword '{keyword}': picked product {best.get('product_id')} "
                 f"| volume: {best.get('lastest_volume')}"
@@ -412,11 +407,11 @@ async def fetch_one_product() -> dict | None:
 # FORMAT MESSAGE
 # =========================
 def format_stars(rating_str: str) -> str:
-    """Convert numeric rating like '96%' or '4.8' to star display."""
+    """تحويل التقييم مثل '96%' أو '4.8' إلى نجوم."""
     try:
         if "%" in rating_str:
             pct = float(rating_str.replace("%", ""))
-            score = pct / 20  # convert 0-100% to 0-5 stars
+            score = pct / 20
         else:
             score = float(rating_str)
         full = int(score)
@@ -435,7 +430,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
         usd = 0.0
     dzd = int(usd * USD_TO_DZD)
 
-    # Original price line
+    # السعر الأصلي
     try:
         original_usd = float(p.get("target_original_price", usd))
         if original_usd > usd:
@@ -446,7 +441,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
     except (ValueError, TypeError):
         original_line = ""
 
-    # Shipping
+    # الشحن
     fee = str(shipping.get("shipping_fee", "0"))
     min_days = shipping.get("min_delivery_days", "?")
     max_days = shipping.get("max_delivery_days", "?")
@@ -465,7 +460,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
         fee_dzd = int(fee_float * USD_TO_DZD)
         shipping_line = f"{fee_float:.2f}$ | {fee_dzd:,} دج"
 
-    # Rating
+    # التقييم
     rating_raw = p.get("evaluate_rate", "")
     if rating_raw:
         stars = format_stars(str(rating_raw))
@@ -473,7 +468,6 @@ async def build_caption(p: dict, shipping: dict) -> str:
     else:
         rating_line = ""
 
-    # Discount badge
     discount = p.get("discount", "N/A")
 
     lines = [
@@ -488,6 +482,8 @@ async def build_caption(p: dict, shipping: dict) -> str:
         f"💵 السعر : <b>{usd:.2f}$ | {dzd:,} دج</b>",
         f"🚚 الشحن : {shipping_line}",
     ]
+    if delivery_line:
+        lines.append(delivery_line)
     lines.append(f"🚀 المبيعات : {p.get('lastest_volume', '0')}+")
     if rating_line:
         lines.append(rating_line)
@@ -529,7 +525,6 @@ async def post_loop():
 
             pid = str(product.get("product_id", ""))
 
-            # Double-check not already posted (race-condition guard)
             if pid in POSTED_IDS:
                 logging.info(f"Product {pid} already posted, skipping.")
                 continue
@@ -566,6 +561,7 @@ async def post_loop():
             POST_COUNTER += 1
             if POST_COUNTER >= 6:
                 POST_COUNTER = 0
+
             logging.info(
                 f"✅ Posted {pid} | volume: {product.get('lastest_volume')} "
                 f"| fee: {fee_raw}$ | keyword index now: {KEYWORD_INDEX}"
