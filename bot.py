@@ -503,8 +503,8 @@ def build_button(link: str) -> InlineKeyboardMarkup:
         inline_keyboard=[
             [InlineKeyboardButton(text="🛒 شراء الآن", url=link)],
             [
-                InlineKeyboardButton(text="🤖 خدمات AFFIXON-bot", url=WEBSITE_URL),
-                InlineKeyboardButton(text="📲 Instagram فضائنا على🔗", url=SOCIAL_URL)
+                InlineKeyboardButton(text="🌐 الموقع الإلكتروني", url=WEBSITE_URL),
+                InlineKeyboardButton(text="📱 صفحات التواصل", url=SOCIAL_URL)
             ]
         ]
     )
