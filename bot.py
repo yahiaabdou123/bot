@@ -214,7 +214,7 @@ async def fill_queue():
             if price < 2:
                 continue
 
-            if volume < 1000:
+            if volume < 500:
                 continue
 
             PRODUCT_QUEUE.append(p)
@@ -300,7 +300,7 @@ async def post_loop():
         # فلترة الشحن أكثر من 5$
         fee = shipping.get("shipping_fee", "0")
         try:
-            if float(fee) >= 5:
+            if float(fee) >= 7:
                 print(f"Skipping product {pid} - shipping fee {fee}$")
                 continue
         except:
