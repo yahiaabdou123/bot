@@ -23,9 +23,7 @@ APP_SECRET = os.getenv("APP_SECRET")
 TRACKING_ID = os.getenv("TRACKING_ID")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-BASE_URL = "https://api-sg.aliexpress.com/sync"c"
-
-
+BASE_URL = "https://api-sg.aliexpress.com/sync"
 
 USD_TO_DZD = 260
 MAX_SHIP_FEE = 7
