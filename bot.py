@@ -333,7 +333,6 @@ async def build_caption(p, shipping: dict) -> str:
 💵 السعر : <b>{usd}$ | {dzd:,} دج</b>
 🔖 الخصم : <b>{p.get('discount', 'N/A')}</b>
 🚚 الشحن : {shipping_line}
-📦 التوصيل : {min_days} - {max_days} يوم
 🚀 المبيعات : {p.get('lastest_volume', '0')}+
 {rating_line}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
