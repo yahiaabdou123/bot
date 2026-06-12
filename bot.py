@@ -6,6 +6,7 @@ import aiohttp
 import random
 import json
 import os
+import sys
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.enums import ParseMode
@@ -19,25 +20,25 @@ from aiogram.filters import Command
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = os.getenv("APP_SECRET")
-TRACKING_ID = os.getenv("TRACKING_ID")
+TRACKING_ID = os.getenv("TRACKING_ID", "Telegram")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 BASE_URL = "https://api-sg.aliexpress.com/sync"
 
 USD_TO_DZD = 260
-MAX_SHIP_FEE = 7
+MAX_SHIP_FEE = 1
 MIN_VOLUME = 1000
 MIN_PRICE = 2
 MIN_DISCOUNT = 10
-POST_INTERVAL = 900       # 15 دقيقة بين كل منشور
+POST_INTERVAL = 900  # 15 دقيقة
 
 WEBSITE_URL = "https://www.facebook.com/profile.php?id=61590394005859"
 SOCIAL_URL = "https://www.facebook.com/profile.php?id=61590394005859"
-POST_COUNTER = 0
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    stream=sys.stdout
 )
 
 bot = Bot(
@@ -47,19 +48,16 @@ bot = Bot(
 dp = Dispatcher()
 
 # =========================
-# STORAGE — مسارات ثابتة على Railway Volume
+# STORAGE
 # =========================
 DATA_DIR = "/app/data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 PRODUCT_QUEUE = []
-POSTED_IDS = set()        # ← أضف هذا
-KEYWORD_INDEX = 0         # ← أضف هذا
-DATA_DIR = "/app/data"
-os.makedirs(DATA_DIR, exist_ok=True)
+POSTED_IDS = set()
+KEYWORD_INDEX = 0
 POSTED_FILE = os.path.join(DATA_DIR, "posted.json")
 KEYWORD_INDEX_FILE = os.path.join(DATA_DIR, "keyword_index.json")
-
 
 SEARCH_KEYWORDS = [
      "Baseus Earbuds",
@@ -164,7 +162,7 @@ SEARCH_KEYWORDS = [
 ]
 
 # =========================
-# STATS TRACKING
+# STATS
 # =========================
 BOT_STATS = {
     "total_posted": 0,
@@ -174,7 +172,7 @@ BOT_STATS = {
 }
 
 # =========================
-# LOAD / SAVE HELPERS
+# LOAD / SAVE
 # =========================
 def load_posted():
     global POSTED_IDS
@@ -200,7 +198,6 @@ def save_keyword_index():
         json.dump({"index": KEYWORD_INDEX}, f)
 
 def next_keyword() -> str:
-    """يرجع الكلمة التالية في الدورة ويقدّم الفهرس."""
     global KEYWORD_INDEX
     keyword = SEARCH_KEYWORDS[KEYWORD_INDEX]
     KEYWORD_INDEX = (KEYWORD_INDEX + 1) % len(SEARCH_KEYWORDS)
@@ -218,7 +215,7 @@ def generate_sign(params: dict) -> str:
     return hashlib.md5(s.encode()).hexdigest().upper()
 
 # =========================
-# API REQUEST (مع إعادة المحاولة والانتظار التدريجي)
+# API REQUEST
 # =========================
 async def api_request(method: str, extra: dict, retries: int = 3) -> dict:
     params = {
@@ -266,8 +263,8 @@ async def shorten_title(title: str) -> str:
                         {
                             "role": "user",
                             "content": (
-                                "اختصر اسم هذا المنتج إلى جملة قصيرة واضحة بالفرنسية "
-                                "لا تتجاوز 8 كلمات مع ذكر علامة المنتج، "
+                                "اختصر اسم هذا المنتج إلى جملة قصيرة واضحة بالعربية "
+                                "لا تتجاوز 8 كلمات مع ذكر علامة المنتج إن وجدت، "
                                 "بدون أي شرح إضافي:\n" + title
                             )
                         }
@@ -276,8 +273,7 @@ async def shorten_title(title: str) -> str:
                 timeout=aiohttp.ClientTimeout(total=10)
             ) as r:
                 data = await r.json()
-                short = data["choices"][0]["message"]["content"].strip()
-                short = short.strip('"\'')
+                short = data["choices"][0]["message"]["content"].strip().strip('"\'')
                 return short if short else title[:60]
     except Exception as e:
         logging.warning(f"AI title shortener failed: {e}")
@@ -341,88 +337,35 @@ async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: 
         return {}
 
 # =========================
-# FETCH PRODUCT — عشوائي (للمنشورات الأولى)
-# =========================
-async def fetch_product_query():
-    for _ in range(10):
-        keyword = random.choice(SEARCH_KEYWORDS)
-        try:
-            resp = await api_request(
-                "aliexpress.affiliate.product.query",
-                {
-                    "keywords": keyword,
-                    "page_no": random.randint(1, 5),
-                    "page_size": 50,
-                    "target_currency": "USD",
-                    "target_language": "FR",
-                    "tracking_id": TRACKING_ID,
-                    "ship_to_country": "DZ",
-                }
-            )
-
-            products = (
-                resp.get("aliexpress_affiliate_product_query_response", {})
-                .get("resp_result", {})
-                .get("result", {})
-                .get("products", {})
-                .get("product", [])
-            )
-
-            filtered = []
-            for p in products:
-                pid = str(p.get("product_id", ""))
-                if not pid or pid in POSTED_IDS:
-                    continue
-                try:
-                    price = float(p.get("target_sale_price", 0))
-                    volume = int(p.get("lastest_volume", 0))
-                    discount = int(str(p.get("discount", "0")).replace("%", ""))
-                except Exception:
-                    continue
-                if price < MIN_PRICE or volume < MIN_VOLUME or discount < MIN_DISCOUNT:
-                    continue
-                if not p.get("product_main_image_url"):
-                    continue
-                filtered.append(p)
-
-            if filtered:
-                # ✅ إصلاح: اختيار المنتج الأعلى مبيعاً بدل العشوائي
-                return max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
-
-        except Exception as e:
-            logging.error(e)
-
-    return None
-
-# =========================
-# FETCH ONE PRODUCT — كلمة مفتاحية واحدة لكل دورة
+# FETCH PRODUCT — باستخدام affiliate.product.query
 # =========================
 async def fetch_one_product() -> dict | None:
-    """
-    يستخدم الكلمة التالية في الدورة، يجلب المنتجات، يفلترها،
-    ويرجع المنتج الأعلى مبيعاً.
-    يجرب 10 كلمات متتالية إذا لم يجد نتائج.
-    """
     for _ in range(min(10, len(SEARCH_KEYWORDS))):
         keyword = next_keyword()
         logging.info(f"Searching with keyword: '{keyword}'")
         try:
             resp = await api_request(
-                "aliexpress.affiliate.hotproduct.query",
+                "aliexpress.affiliate.product.query",
                 {
                     "keywords": keyword,
                     "page_no": random.randint(1, 3),
                     "page_size": 20,
                     "target_currency": "USD",
-                    "target_language": "FR",
+                    "target_language": "AR",
                     "tracking_id": TRACKING_ID,
                     "sort": "LAST_VOLUME_DESC",
                     "ship_to_country": "DZ",
+                    "min_sale_price": MIN_PRICE,
+                    "fields": (
+                        "product_id,product_title,target_sale_price,target_original_price,"
+                        "discount,evaluate_rate,lastest_volume,product_main_image_url,"
+                        "promotion_link,product_detail_url,sku_id,tax_rate"
+                    ),
                 }
             )
 
             products = (
-                resp.get("aliexpress_affiliate_hotproduct_query_response", {})
+                resp.get("aliexpress_affiliate_product_query_response", {})
                 .get("resp_result", {})
                 .get("result", {})
                 .get("products", {})
@@ -443,7 +386,7 @@ async def fetch_one_product() -> dict | None:
                 try:
                     volume = int(p.get("lastest_volume", 0))
                 except (ValueError, TypeError):
-                    continue
+                    volume = 0
                 if volume < MIN_VOLUME:
                     continue
                 try:
@@ -460,7 +403,6 @@ async def fetch_one_product() -> dict | None:
                 logging.info(f"Keyword '{keyword}': no valid products, trying next…")
                 continue
 
-            # ✅ إصلاح: اختيار المنتج الأعلى مبيعاً بدل العشوائي
             best = max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
             logging.info(
                 f"Keyword '{keyword}': picked product {best.get('product_id')} "
@@ -479,11 +421,9 @@ async def fetch_one_product() -> dict | None:
 # FORMAT MESSAGE
 # =========================
 def format_stars(rating_str: str) -> str:
-    """تحويل التقييم مثل '96%' أو '4.8' إلى نجوم."""
     try:
         if "%" in rating_str:
-            pct = float(rating_str.replace("%", ""))
-            score = pct / 20
+            score = float(rating_str.replace("%", "")) / 20
         else:
             score = float(rating_str)
         full = int(score)
@@ -502,7 +442,6 @@ async def build_caption(p: dict, shipping: dict) -> str:
         usd = 0.0
     dzd = int(usd * USD_TO_DZD)
 
-    # السعر الأصلي
     try:
         original_usd = float(p.get("target_original_price", usd))
         if original_usd > usd:
@@ -513,7 +452,6 @@ async def build_caption(p: dict, shipping: dict) -> str:
     except (ValueError, TypeError):
         original_line = ""
 
-    # الشحن
     fee = str(shipping.get("shipping_fee", "0"))
     min_days = shipping.get("min_delivery_days", "?")
     max_days = shipping.get("max_delivery_days", "?")
@@ -532,7 +470,6 @@ async def build_caption(p: dict, shipping: dict) -> str:
         fee_dzd = int(fee_float * USD_TO_DZD)
         shipping_line = f"{fee_float:.2f}$ | {fee_dzd:,} دج"
 
-    # التقييم
     rating_raw = p.get("evaluate_rate", "")
     if rating_raw:
         stars = format_stars(str(rating_raw))
@@ -540,10 +477,8 @@ async def build_caption(p: dict, shipping: dict) -> str:
     else:
         rating_line = ""
 
-    discount = p.get("discount", "N/A")
-
     lines = [
-        "🇩🇿لافاااااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
+        "🇩🇿 لافاااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
         f"🔥 <b>{title}</b>",
         "",
@@ -554,12 +489,14 @@ async def build_caption(p: dict, shipping: dict) -> str:
         f"💵 السعر : <b>{usd:.2f}$ | {dzd:,} دج</b>",
         f"🚚 الشحن : {shipping_line}",
     ]
+    if delivery_line:
+        lines.append(delivery_line)
     lines.append(f"🚀 المبيعات : {p.get('lastest_volume', '0')}+")
     if rating_line:
         lines.append(rating_line)
     lines += [
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
-        "AFFIXON-express |  AliExpress لافار تاع 💯",
+        "AFFIXON-express | لافار تاع AliExpress 💯",
     ]
 
     return "\n".join(lines)
@@ -567,7 +504,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
 def build_button(link: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🛒 شراء الآن على Aliexpress ", url=link)],
+            [InlineKeyboardButton(text="🛒 شراء الآن على Aliexpress", url=link)],
             [
                 InlineKeyboardButton(text="🌐 الموقع الإلكتروني", url=WEBSITE_URL),
                 InlineKeyboardButton(text="📱 صفحة التواصل", url=SOCIAL_URL)
@@ -581,12 +518,7 @@ def build_button(link: str) -> InlineKeyboardMarkup:
 async def post_loop():
     while True:
         try:
-            global POST_COUNTER
-
-            if POST_COUNTER < 5:
-                product = await fetch_product_query()
-            else:
-                product = await fetch_one_product()
+            product = await fetch_one_product()
 
             if not product:
                 logging.warning("No product found this cycle. Waiting 60s…")
@@ -628,10 +560,6 @@ async def post_loop():
             save_posted()
             BOT_STATS["total_posted"] += 1
 
-            POST_COUNTER += 1
-            if POST_COUNTER >= 6:
-                POST_COUNTER = 0
-
             logging.info(
                 f"✅ Posted {pid} | volume: {product.get('lastest_volume')} "
                 f"| fee: {fee_raw}$ | keyword index now: {KEYWORD_INDEX}"
@@ -654,7 +582,6 @@ async def cmd_start(m: Message):
         "🇩🇿 مخصص للسوق الجزائري\n\n"
         "<b>الأوامر المتاحة:</b>\n"
         "/status — حالة البوت\n"
-        "/queue — عدد المنتجات في الانتظار\n"
         "/keyword — الكلمة المفتاحية الحالية\n"
         "/stats — إحصائيات المنشورات"
     )
@@ -666,7 +593,6 @@ async def cmd_status(m: Message):
     minutes = rem // 60
     await m.answer(
         f"📊 <b>حالة البوت</b>\n\n"
-        f"📦 المنتجات في الانتظار: {len(PRODUCT_QUEUE)}\n"
         f"✅ المنتجات المنشورة: {len(POSTED_IDS)}\n"
         f"⏱ الفترة بين المنشورات: {POST_INTERVAL // 60} دقيقة\n"
         f"🕐 وقت التشغيل: {hours}h {minutes}m"
@@ -692,16 +618,6 @@ async def cmd_keyword(m: Message):
         f"➡️ <b>التالية:</b> {next_kw}\n"
         f"📌 <b>الرقم:</b> {KEYWORD_INDEX + 1} / {len(SEARCH_KEYWORDS)}"
     )
-
-@dp.message(Command("queue"))
-async def cmd_queue(m: Message):
-    if not PRODUCT_QUEUE:
-        await m.answer("📭 قائمة الانتظار فارغة، سيتم جلب منتجات جديدة قريباً.")
-    else:
-        lines = [f"📦 <b>المنتجات في الانتظار: {len(PRODUCT_QUEUE)}</b>\n"]
-        for i, p in enumerate(PRODUCT_QUEUE[:5], 1):
-            lines.append(f"{i}. {p.get('product_title', '')[:55]}…")
-        await m.answer("\n".join(lines))
 
 # =========================
 # MAIN
