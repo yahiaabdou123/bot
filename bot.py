@@ -31,8 +31,8 @@ MIN_PRICE = 2
 MIN_DISCOUNT = 10
 POST_INTERVAL = 900       # 15 دقيقة بين كل منشور
 
-WEBSITE_URL = "https://your-site.com"
-SOCIAL_URL = "https://t.me/yourchannel"
+WEBSITE_URL = "قبد التطوير"
+SOCIAL_URL = "https://www.facebook.com/profile.php?id=61590394005859"
 POST_COUNTER = 0
 
 logging.basicConfig(
@@ -62,35 +62,105 @@ KEYWORD_INDEX_FILE = os.path.join(DATA_DIR, "keyword_index.json")
 
 
 SEARCH_KEYWORDS = [
-    "Smart Watch", "Wireless Earbuds", "Bluetooth Earbuds", "TWS Earbuds",
-    "Gaming Headset", "Gaming Mouse", "Mechanical Keyboard", "RGB Keyboard",
-    "Gaming Controller", "Phone Cooler", "Power Bank", "Fast Charger 65W",
-    "USB C Cable", "Wireless Charger", "MagSafe Charger", "Phone Holder",
-    "Magnetic Phone Holder", "Mini Projector", "Portable Projector",
-    "Bluetooth Speaker", "Smart Ring", "Fitness Tracker", "Smart Home Device",
-    "WiFi Camera", "Security Camera", "Dash Cam", "Car Phone Holder",
-    "Car Charger", "CarPlay Adapter", "LED Strip Lights", "RGB Lights",
-    "LED Matrix Display", "USB Hub", "USB C Hub", "Laptop Stand",
-    "Bluetooth Mouse", "Portable SSD", "External Hard Drive", "Thermal Printer",
-    "Mini Printer", "Air Duster", "Mini Vacuum Cleaner", "Portable Fan",
-    "Rechargeable Flashlight", "Digital Alarm Clock", "Webcam HD",
-    "Action Camera", "Drone Camera", "VR Headset", "Gamepad Mobile",
-    "Streaming Microphone", "USB Microphone", "Tripod Phone", "Selfie Stick",
-    "Ring Light", "Portable Monitor", "Mini PC", "Android TV Box",
-    "Smart TV Stick", "Wireless Keyboard", "Wireless Mouse", "Solar Power Bank",
-    "Wireless Security Camera", "Mini Bluetooth Speaker", "Noise Cancelling Earbuds",
-    "Gaming Desk Accessories", "Tech Gadgets", "Cool Gadgets", "Trending Gadgets",
-    "TikTok Gadgets", "Budget Tech", "Portable Electronics", "Gamer Accessories",
-    "Mobile Accessories", "Smartphone Accessories", "RGB Gaming Setup",
-    "USB Gadgets", "Electronic Gadgets", "Home Tech", "Car Tech Accessories",
-    "Travel Gadgets", "Innovative Gadgets", "Wireless Devices",
-    "Best Selling Electronics", "Viral Products", "Hot Sale Electronics",
-    "AliExpress Finds", "Must Have Gadgets", "Tech Gifts", "Student Gadgets",
-    "Office Gadgets", "Desk Setup Accessories", "Gaming Setup Accessories",
-    "Phone Accessories", "Laptop Accessories", "Computer Accessories",
-    "Electronic Accessories", "Smart Devices", "Portable Tech Devices",
-    "Wireless Technology", "Mini Electronic Devices", "Smartphone",
-    "Future Tech Gadgets",
+     "Baseus Earbuds",
+    "Galaxy Projector",
+    "QCY Earbuds",
+    "Redragon Mechanical Keyboard",
+    "Bluetooth Speaker",
+    "Sonoff Smart Switch",
+    "Amazfit Smart Watch",
+    "Portable Monitor",
+    "Haylou Earbuds",
+    "Phone Case",
+    "DJI Drone",
+    "UGREEN Fast Charger",
+    "RGB Light Bar",
+    "COLMI Smart Watch",
+    "Anker Soundcore Earbuds",
+    "Car Accessories",
+    "Sunset Lamp",
+    "Lenovo Earbuds",
+    "Wireless Charger",
+    "Attack Shark Mouse",
+    "Bluetooth Keyboard",
+    "Xiaomi Smartphone",
+    "Night Light",
+    "Gaming Headset",
+    "Mcdodo Fast Charger",
+    "Edifier Earbuds",
+    "Security Camera",
+    "Mini Projector",
+    "Zeblaze Smart Watch",
+    "Bluetooth Adapter",
+    "Yeelight LED Strip",
+    "Baseus Power Bank",
+    "Smart LED Lights",
+    "GoPro Accessories",
+    "KOSPET Smart Watch",
+    "RGB Mouse Pad",
+    "Portable Speaker",
+    "Bluetooth Mouse",
+    "Vacuum Cleaner",
+    "JOYROOM Phone Holder",
+    "Crystal Lamp",
+    "POCO Smartphone",
+    "Bluetooth Gamepad",
+    "Aqara Sensor",
+    "Mechanical Keyboard",
+    "SoundPEATS Earbuds",
+    "WiFi Camera",
+    "Desk Lamp",
+    "Insta360 Camera",
+    "Essager Fast Charger",
+    "Moon Lamp",
+    "Bluetooth Receiver",
+    "Haylou Smart Watch",
+    "Dash Cam",
+    "Anker Charger",
+    "Room Decor",
+    "Bluetooth Microphone",
+    "Neon Sign",
+    "Gaming Mouse",
+    "AKASO Camera",
+    "BroadLink Smart Home",
+    "Baseus Fast Charger",
+    "Toocki Fast Charger",
+    "Blackview Smart Watch",
+    "Electric Screwdriver",
+    "UGREEN Power Bank",
+    "Bluetooth Transmitter",
+    "Wall Decor",
+    "Aula Keyboard",
+    "Tuya Smart Plug",
+    "Noise Cancelling Headphones",
+    "USB C Cable",
+    "Smart LED Strip",
+    "Smart Home",
+    "Baseus Earphones",
+    "MagSafe Accessories",
+    "Smart Watch",
+    "TWS Earbuds",
+    "Bluetooth Headphones",
+    "Smartphone Accessories",
+    "Govee RGB Lights",
+    "Machenike Keyboard",
+    "Redmi Smartphone",
+    "TOZO Earbuds",
+    "Baseus Phone Holder",
+    "JOYROOM Fast Charger",
+    "Fast Charger",
+    "Power Bank",
+    "Phone Holder",
+    "Wireless Earbuds",
+    "Smart Lamp",
+    "RGB Lights",
+    "Gaming Keyboard",
+    "Bluetooth Devices",
+    "LED Strip Lights",
+    "Smart Camera",
+    "Home Decor",
+    "Portable Charger",
+    "Smart Gadgets",
 ]
 
 # =========================
@@ -473,7 +543,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
     discount = p.get("discount", "N/A")
 
     lines = [
-        "🇩🇿 أفضل عروض Aliexpress 💥",
+        "🇩🇿لافاااااااااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
         f"🔥 <b>{title}</b>",
         "",
@@ -484,14 +554,12 @@ async def build_caption(p: dict, shipping: dict) -> str:
         f"💵 السعر : <b>{usd:.2f}$ | {dzd:,} دج</b>",
         f"🚚 الشحن : {shipping_line}",
     ]
-    if delivery_line:
-        lines.append(delivery_line)
     lines.append(f"🚀 المبيعات : {p.get('lastest_volume', '0')}+")
     if rating_line:
         lines.append(rating_line)
     lines += [
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
-        "⏬ اضغط على زر الشراء أسفل ⏬",
+        "AFFIXON-express |  AliExpress لافار تاع 💯",
     ]
 
     return "\n".join(lines)
@@ -499,10 +567,10 @@ async def build_caption(p: dict, shipping: dict) -> str:
 def build_button(link: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🛒 شراء الآن", url=link)],
+            [InlineKeyboardButton(text="🛒 شراء الآن على Aliexpress ", url=link)],
             [
                 InlineKeyboardButton(text="🌐 الموقع الإلكتروني", url=WEBSITE_URL),
-                InlineKeyboardButton(text="📱 صفحات التواصل", url=SOCIAL_URL)
+                InlineKeyboardButton(text="📱 صفحة التواصل", url=SOCIAL_URL)
             ]
         ]
     )
