@@ -351,7 +351,7 @@ async def fetch_one_product() -> dict | None:
                     "page_no": random.randint(1, 3),
                     "page_size": 20,
                     "target_currency": "USD",
-                    "target_language": "AR",
+                    "target_language": "FR",
                     "tracking_id": TRACKING_ID,
                     "sort": "LAST_VOLUME_DESC",
                     "ship_to_country": "DZ",
