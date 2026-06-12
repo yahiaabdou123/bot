@@ -31,7 +31,7 @@ MIN_PRICE = 2
 MIN_DISCOUNT = 10
 POST_INTERVAL = 900       # 15 دقيقة بين كل منشور
 
-WEBSITE_URL = "قبد التطوير"
+WEBSITE_URL = "https://www.facebook.com/profile.php?id=61590394005859"
 SOCIAL_URL = "https://www.facebook.com/profile.php?id=61590394005859"
 POST_COUNTER = 0
 
