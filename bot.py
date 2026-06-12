@@ -543,7 +543,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
     discount = p.get("discount", "N/A")
 
     lines = [
-        "🇩🇿لافاااااااااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
+        "🇩🇿لافاااااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
         f"🔥 <b>{title}</b>",
         "",
