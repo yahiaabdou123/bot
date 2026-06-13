@@ -25,10 +25,10 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 BASE_URL = "https://api-sg.aliexpress.com/sync"
 
-USD_TO_DZD = 260
+USD_TO_DZD = 250
 MAX_SHIP_FEE = 1
 MIN_VOLUME = 1000
-MIN_PRICE = 2
+MIN_PRICE = 1
 MIN_DISCOUNT = 10
 POST_INTERVAL = 900  # 15 دقيقة
 
