@@ -471,7 +471,7 @@ async def build_caption(p: dict, shipping: dict) -> str:
         rating_line = ""
 
     lines = [
-        "🇩🇿 لافاااار لي ماتتراطاااش 🔥📢🤯📢🤩📢🔥",
+        "🇩🇿 منتج يستحق الشراء 🔥📢📢📢",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━",
         f"🔥 <b>{title}</b>",
         "",
