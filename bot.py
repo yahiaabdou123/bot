@@ -8,7 +8,7 @@ import json
 import os
 import sys
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command
@@ -16,7 +16,6 @@ from aiogram.filters import Command
 # =========================
 # CONFIG
 # =========================
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = os.getenv("APP_SECRET")
@@ -60,105 +59,110 @@ POSTED_FILE = os.path.join(DATA_DIR, "posted.json")
 KEYWORD_INDEX_FILE = os.path.join(DATA_DIR, "keyword_index.json")
 
 SEARCH_KEYWORDS = [
-     "Baseus Earbuds",
-    "Galaxy Projector",
-    "QCY Earbuds",
-    "Redragon Mechanical Keyboard",
-    "Bluetooth Speaker",
-    "Sonoff Smart Switch",
-    "Amazfit Smart Watch",
-    "Portable Monitor",
-    "Haylou Earbuds",
-    "Phone Case",
-    "DJI Drone",
-    "UGREEN Fast Charger",
-    "RGB Light Bar",
-    "COLMI Smart Watch",
-    "Anker Soundcore Earbuds",
-    "Car Accessories",
-    "Sunset Lamp",
-    "Lenovo Earbuds",
-    "Wireless Charger",
-    "Attack Shark Mouse",
-    "Bluetooth Keyboard",
-    "Xiaomi Smartphone",
-    "Night Light",
-    "Gaming Headset",
-    "Mcdodo Fast Charger",
-    "Edifier Earbuds",
-    "Security Camera",
-    "Mini Projector",
-    "Zeblaze Smart Watch",
-    "Bluetooth Adapter",
-    "Yeelight LED Strip",
+    "POCO F7 Pro",
     "Baseus Power Bank",
-    "Smart LED Lights",
-    "GoPro Accessories",
-    "KOSPET Smart Watch",
-    "RGB Mouse Pad",
-    "Portable Speaker",
-    "Bluetooth Mouse",
-    "Vacuum Cleaner",
-    "JOYROOM Phone Holder",
-    "Crystal Lamp",
-    "POCO Smartphone",
-    "Bluetooth Gamepad",
-    "Aqara Sensor",
-    "Mechanical Keyboard",
-    "SoundPEATS Earbuds",
-    "WiFi Camera",
-    "Desk Lamp",
+    "Redragon Mechanical Keyboard",
+    "OnePlus 15",
+    "Anker Soundcore Earbuds",
+    "DJI Drone",
+    "Honor 400 Pro",
+    "Attack Shark Mouse",
+    "UGREEN Fast Charger",
+    "Amazfit Smart Watch",
+    "Xiaomi 15 Ultra",
+    "Bluetooth Speaker",
     "Insta360 Camera",
-    "Essager Fast Charger",
-    "Moon Lamp",
-    "Bluetooth Receiver",
+    "POCO F7 Ultra",
+    "QCY Earbuds",
+    "Sonoff Smart Switch",
+    "Google Pixel 9 Pro",
+    "Gaming Headset",
+    "RedMagic 10 Pro",
+    "Edifier Headphones",
+    "Tuya Security Camera",
+    "Realme 16 Pro Plus",
+    "Mechanical Keyboard",
     "Haylou Smart Watch",
-    "Dash Cam",
-    "Anker Charger",
-    "Room Decor",
-    "Bluetooth Microphone",
-    "Neon Sign",
-    "Gaming Mouse",
-    "AKASO Camera",
-    "BroadLink Smart Home",
-    "Baseus Fast Charger",
-    "Toocki Fast Charger",
-    "Blackview Smart Watch",
-    "Electric Screwdriver",
-    "UGREEN Power Bank",
-    "Bluetooth Transmitter",
-    "Wall Decor",
-    "Aula Keyboard",
-    "Tuya Smart Plug",
-    "Noise Cancelling Headphones",
-    "USB C Cable",
-    "Smart LED Strip",
-    "Smart Home",
-    "Baseus Earphones",
-    "MagSafe Accessories",
-    "Smart Watch",
-    "TWS Earbuds",
-    "Bluetooth Headphones",
-    "Smartphone Accessories",
-    "Govee RGB Lights",
-    "Machenike Keyboard",
-    "Redmi Smartphone",
-    "TOZO Earbuds",
-    "Baseus Phone Holder",
-    "JOYROOM Fast Charger",
-    "Fast Charger",
+    "OPPO Find X8 Pro",
     "Power Bank",
-    "Phone Holder",
+    "DJI Gimbal",
+    "Lenovo Earbuds",
+    "Vivo X200 Pro",
+    "Smart Home",
+    "Redmi Earbuds",
+    "KOSPET Rugged Smart Watch",
+    "Honor Magic 7 Pro",
+    "Govee RGB Lights",
+    "UGREEN Power Bank",
+    "Nothing Phone 3a Pro",
+    "Redragon Gaming Mouse",
+    "CMF Phone 2 Pro",
+    "Yeelight Desk Lamp",
+    "Baseus Earbuds",
+    "iQOO 13",
+    "Aqara Door Sensor",
+    "Edifier Bluetooth Speaker",
+    "POCO X8 Pro",
     "Wireless Earbuds",
-    "Smart Lamp",
-    "RGB Lights",
+    "Google Pixel 9",
+    "COLMI Smart Watch",
+    "DOOGEE V Max",
+    "Insta360 Accessories",
+    "Xiaomi 15 Pro",
+    "Tuya Smart Plug",
+    "QCY Headphones",
+    "Redmi Note 15 Pro Plus",
+    "Zeblaze Smart Watch",
+    "Blackview Shark 9",
+    "Govee TV Backlight",
+    "Lenovo Smart Watch",
+    "Ulefone Armor 30",
+    "Haylou Earbuds",
+    "POCO Phone Case",
+    "Amazfit Smart Band",
+    "Joyroom Phone Holder",
+    "Essager USB C Cable",
+    "5G Smartphone",
+    "12GB RAM",
+    "256GB",
+    "512GB",
+    "Global Version",
+    "NFC",
+    "POCO F7",
+    "Samsung Galaxy S25 Ultra",
+    "OnePlus 15R",
+    "Honor 400",
+    "Realme 16 Pro",
+    "Vivo X200",
+    "OPPO Find X8",
+    "Nothing Phone 3a",
+    "nubia Z70 Ultra",
+    "Redmi Note 15 Pro",
+    "Redmi Note 15",
+    "POCO M8",
+    "CMF Phone 2 Pro",
+    "Xiaomi 15",
+    "COLMI Smart Band",
+    "Yeelight LED Strip",
+    "Smart Watch",
+    "Bluetooth Earbuds",
+    "Portable Speaker",
+    "Fast Charger",
+    "Phone Holder",
+    "USB C Cable",
+    "Wireless Charger",
+    "Magnetic Power Bank",
+    "Mini PC",
+    "Android Tablet",
+    "Gaming Mouse",
     "Gaming Keyboard",
-    "Bluetooth Devices",
-    "LED Strip Lights",
-    "Smart Camera",
-    "Home Decor",
-    "Portable Charger",
-    "Smart Gadgets",
+    "Portable Monitor",
+    "Mini Projector",
+    "WiFi Camera",
+    "Robot Vacuum",
+    "Electric Scooter",
+    "Dash Camera",
+    "Action Camera",
 ]
 
 # =========================
@@ -228,13 +232,11 @@ async def api_request(method: str, extra: dict, retries: int = 3) -> dict:
     }
     params.update(extra)
     params["sign"] = generate_sign(params)
-
     for attempt in range(retries):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
-                    BASE_URL,
-                    data=params,
+                    BASE_URL, data=params,
                     timeout=aiohttp.ClientTimeout(total=15)
                 ) as r:
                     return await r.json()
@@ -337,85 +339,76 @@ async def get_shipping_info(product_id: str, price: str, sku_id: str, tax_rate: 
         return {}
 
 # =========================
-# FETCH PRODUCT — باستخدام affiliate.product.query
+# جلب SKU (الخيارات مع الصور)
 # =========================
-async def fetch_one_product() -> dict | None:
-    for _ in range(min(10, len(SEARCH_KEYWORDS))):
-        keyword = next_keyword()
-        logging.info(f"Searching with keyword: '{keyword}'")
+async def get_sku_details(product_id: str) -> list:
+    try:
+        resp = await api_request(
+            "aliexpress.affiliate.product.sku.detail.get",
+            {
+                "product_id": product_id,
+                "target_currency": "USD",
+                "target_language": "EN",
+                "tracking_id": TRACKING_ID,
+                "ship_to_country": "DZ",
+            }
+        )
+        skus = (
+            resp.get("aliexpress_affiliate_product_sku_detail_get_response", {})
+            .get("result", {})
+            .get("result", {})
+            .get("ae_item_sku_info", {})
+            .get("traffic_sku_info_list", [])
+        )
+        return skus if skus else []
+    except Exception as e:
+        logging.warning(f"SKU fetch failed: {e}")
+        return []
+
+# =========================
+# تحليل SKU
+# =========================
+def parse_skus(skus: list) -> list:
+    results = []
+    seen_images = set()
+    for sku in skus:
         try:
-            resp = await api_request(
-                "aliexpress.affiliate.product.query",
-                {
-                    "keywords": keyword,
-                    "page_no": random.randint(1, 3),
-                    "page_size": 20,
-                    "target_currency": "USD",
-                    "target_language": "FR",
-                    "tracking_id": TRACKING_ID,
-                    "sort": "LAST_VOLUME_DESC",
-                    "ship_to_country": "DZ",
-                    "min_sale_price": MIN_PRICE,
-                    "fields": (
-                        "product_id,product_title,target_sale_price,target_original_price,"
-                        "discount,evaluate_rate,lastest_volume,product_main_image_url,"
-                        "promotion_link,product_detail_url,sku_id,tax_rate"
-                    ),
-                }
-            )
+            sale_price = float(sku.get("sale_price_with_tax", 0))
+            original_price = float(sku.get("price_with_tax", sale_price))
+            discount = sku.get("discount_rate", "")
+            image = sku.get("sku_image_link", "")
+            link = sku.get("link", "")
 
-            products = (
-                resp.get("aliexpress_affiliate_product_query_response", {})
-                .get("resp_result", {})
-                .get("result", {})
-                .get("products", {})
-                .get("product", [])
-            )
+            # استخراج اسم الخاصية
+            props_raw = sku.get("sku_properties", "[]")
+            try:
+                props = json.loads(props_raw)
+                prop_name = list(props[0].keys())[0] if props else "خيار"
+                prop_value = list(props[0].values())[0] if props else str(sku.get("color", ""))
+            except:
+                prop_name = "خيار"
+                prop_value = str(sku.get("color", ""))
 
-            filtered = []
-            for p in products:
-                pid = str(p.get("product_id", ""))
-                if not pid or pid in POSTED_IDS:
-                    continue
-                try:
-                    price = float(p.get("target_sale_price", 0))
-                except (ValueError, TypeError):
-                    continue
-                if price < MIN_PRICE:
-                    continue
-                try:
-                    volume = int(p.get("lastest_volume", 0))
-                except (ValueError, TypeError):
-                    volume = 0
-                if volume < MIN_VOLUME:
-                    continue
-                try:
-                    discount = int(str(p.get("discount", "0%")).replace("%", ""))
-                except (ValueError, TypeError):
-                    discount = 0
-                if discount < MIN_DISCOUNT:
-                    continue
-                if not p.get("product_main_image_url"):
-                    continue
-                filtered.append(p)
-
-            if not filtered:
-                logging.info(f"Keyword '{keyword}': no valid products, trying next…")
+            # تجنب تكرار نفس الصورة
+            if image and image in seen_images:
                 continue
+            if image:
+                seen_images.add(image)
 
-            best = max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
-            logging.info(
-                f"Keyword '{keyword}': picked product {best.get('product_id')} "
-                f"| volume: {best.get('lastest_volume')}"
-            )
-            return best
-
-        except Exception as e:
-            logging.error(f"Error fetching products for '{keyword}': {e}")
+            results.append({
+                "prop_name": prop_name,
+                "prop_value": prop_value,
+                "sale_price": sale_price,
+                "original_price": original_price,
+                "discount": discount,
+                "image": image,
+                "link": link,
+            })
+        except:
             continue
 
-    logging.warning("No valid product found after trying 10 keywords.")
-    return None
+    results.sort(key=lambda x: x["sale_price"])
+    return results
 
 # =========================
 # FORMAT MESSAGE
@@ -513,6 +506,147 @@ def build_button(link: str) -> InlineKeyboardMarkup:
     )
 
 # =========================
+# إرسال الخيارات كـ Album
+# =========================
+async def send_sku_album(chat_id: int, skus: list, title: str):
+    """يرسل صور الخيارات كـ album مع أسعارها"""
+    if not skus:
+        return
+
+    # فلتر الخيارات التي عندها صور فقط
+    skus_with_images = [s for s in skus if s.get("image")]
+    if not skus_with_images:
+        return
+
+    # Telegram يسمح بـ 10 صور كحد أقصى في album
+    skus_with_images = skus_with_images[:10]
+
+    prop_name = skus_with_images[0].get("prop_name", "خيار")
+
+    media_group = []
+    for i, sku in enumerate(skus_with_images):
+        price = sku["sale_price"]
+        dzd = int(price * USD_TO_DZD)
+        original = sku["original_price"]
+        discount = sku.get("discount", "")
+        val = sku.get("prop_value", str(i + 1))
+
+        # كل صورة تعرض سعرها + قائمة كل الأسعار في الصورة الأولى
+        cheapest_mark = " ✅ الأرخص" if i == 0 else ""
+        caption = f"🎨 {prop_name} <b>{val}</b> — {price:.2f}$ | {dzd:,} دج"
+        if discount:
+            caption += f" 🏷{discount}%"
+        caption += cheapest_mark
+
+        if i == 0:
+            caption += f"\n\n<b>كل الخيارات:</b>\n"
+            for j, s in enumerate(skus_with_images):
+                p = s["sale_price"]
+                d = int(p * USD_TO_DZD)
+                v = s.get("prop_value", str(j + 1))
+                disc = s.get("discount", "")
+                mark = " ✅" if j == 0 else ""
+                caption += f"{j+1}. {prop_name} {v} — {p:.2f}$ | {d:,} دج"
+                if disc:
+                    caption += f" 🏷{disc}%"
+                caption += mark + "\n"
+            caption = caption[:1024]
+
+        media_group.append(
+            InputMediaPhoto(
+                media=sku["image"],
+                caption=caption,
+                parse_mode=ParseMode.HTML if i == 0 else None
+            )
+        )
+
+    try:
+        await bot.send_media_group(chat_id=chat_id, media=media_group)
+    except Exception as e:
+        logging.warning(f"Album send failed: {e}")
+
+# =========================
+# FETCH PRODUCT
+# =========================
+async def fetch_one_product() -> dict | None:
+    for _ in range(min(10, len(SEARCH_KEYWORDS))):
+        keyword = next_keyword()
+        logging.info(f"Searching with keyword: '{keyword}'")
+        try:
+            resp = await api_request(
+                "aliexpress.affiliate.product.query",
+                {
+                    "keywords": keyword,
+                    "page_no": random.randint(1, 3),
+                    "page_size": 20,
+                    "target_currency": "USD",
+                    "target_language": "FR",
+                    "tracking_id": TRACKING_ID,
+                    "sort": "LAST_VOLUME_DESC",
+                    "ship_to_country": "DZ",
+                    "min_sale_price": MIN_PRICE,
+                    "fields": (
+                        "product_id,product_title,target_sale_price,target_original_price,"
+                        "discount,evaluate_rate,lastest_volume,product_main_image_url,"
+                        "promotion_link,product_detail_url,sku_id,tax_rate"
+                    ),
+                }
+            )
+
+            products = (
+                resp.get("aliexpress_affiliate_product_query_response", {})
+                .get("resp_result", {})
+                .get("result", {})
+                .get("products", {})
+                .get("product", [])
+            )
+
+            filtered = []
+            for p in products:
+                pid = str(p.get("product_id", ""))
+                if not pid or pid in POSTED_IDS:
+                    continue
+                try:
+                    price = float(p.get("target_sale_price", 0))
+                except (ValueError, TypeError):
+                    continue
+                if price < MIN_PRICE:
+                    continue
+                try:
+                    volume = int(p.get("lastest_volume", 0))
+                except (ValueError, TypeError):
+                    volume = 0
+                if volume < MIN_VOLUME:
+                    continue
+                try:
+                    discount = int(str(p.get("discount", "0%")).replace("%", ""))
+                except (ValueError, TypeError):
+                    discount = 0
+                if discount < MIN_DISCOUNT:
+                    continue
+                if not p.get("product_main_image_url"):
+                    continue
+                filtered.append(p)
+
+            if not filtered:
+                logging.info(f"Keyword '{keyword}': no valid products, trying next…")
+                continue
+
+            best = max(filtered, key=lambda x: int(x.get("lastest_volume", 0)))
+            logging.info(
+                f"Keyword '{keyword}': picked product {best.get('product_id')} "
+                f"| volume: {best.get('lastest_volume')}"
+            )
+            return best
+
+        except Exception as e:
+            logging.error(f"Error fetching products for '{keyword}': {e}")
+            continue
+
+    logging.warning("No valid product found after trying 10 keywords.")
+    return None
+
+# =========================
 # POST LOOP
 # =========================
 async def post_loop():
@@ -526,7 +660,6 @@ async def post_loop():
                 continue
 
             pid = str(product.get("product_id", ""))
-
             if pid in POSTED_IDS:
                 logging.info(f"Product {pid} already posted, skipping.")
                 continue
@@ -535,7 +668,11 @@ async def post_loop():
             sku_id = str(product.get("sku_id", ""))
             tax_rate = str(product.get("tax_rate", "0.00"))
 
-            shipping = await get_shipping_info(pid, price, sku_id, tax_rate)
+            # جلب الشحن والـ SKU بالتوازي
+            shipping, skus_raw = await asyncio.gather(
+                get_shipping_info(pid, price, sku_id, tax_rate),
+                get_sku_details(pid),
+            )
 
             fee_raw = shipping.get("shipping_fee", "0")
             try:
@@ -548,7 +685,15 @@ async def post_loop():
 
             link = await get_short_link(product.get("promotion_link", ""))
             caption = await build_caption(product, shipping)
+            skus = parse_skus(skus_raw)
 
+            # رسالة 1 — صور الخيارات أولاً (إذا وجدت أكثر من خيار)
+            if len(skus) > 1:
+                title = product.get("product_title", "")
+                await send_sku_album(CHANNEL_ID, skus, title)
+                await asyncio.sleep(1)
+
+            # رسالة 2 — المنتج الرئيسي مع التفاصيل والأزرار
             await bot.send_photo(
                 chat_id=CHANNEL_ID,
                 photo=product.get("product_main_image_url"),
@@ -562,7 +707,7 @@ async def post_loop():
 
             logging.info(
                 f"✅ Posted {pid} | volume: {product.get('lastest_volume')} "
-                f"| fee: {fee_raw}$ | keyword index now: {KEYWORD_INDEX}"
+                f"| fee: {fee_raw}$ | skus: {len(skus)} | keyword index now: {KEYWORD_INDEX}"
             )
 
         except Exception as e:
